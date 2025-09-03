@@ -1,142 +1,83 @@
 import { AgentTool } from '../types';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import * as os from 'os';
-
-const execAsync = promisify(exec);
 
 export const systemTools: AgentTool[] = [
   {
-    id: 'system_execute',
-    name: 'Execute Command',
-    description: 'Execute system commands',
+    id: 'system_info_client',
+    name: 'Client System Info',
+    description: 'Get client-side system information (browser environment)',
     category: 'system',
     parameters: {
-      command: { type: 'string', description: 'Command to execute' },
-      timeout: { type: 'number', description: 'Timeout in milliseconds (default: 30000)', optional: true },
-      cwd: { type: 'string', description: 'Working directory', optional: true },
-    },
-    safetyCheck: (params) => {
-      if (!params.command || typeof params.command !== 'string') {
-        return false;
-      }
-      // Prevent dangerous commands
-      const dangerousPatterns = [
-        /^rm\s+-rf\s+\//,
-        /^dd\s+if=/,
-        /^mkfs\./,
-        /^fdisk/,
-        /^format/,
-        /^del\s+[A-Z]:\\/,
-        /^rmdir\/s\/q/,
-        /^shutdown/,
-        /^reboot/,
-        /^halt/,
-        /^passwd/,
-        /^su\s+/,
-        /^sudo\s+/,
-        /^chmod\s+777/,
-        /^chown\s+root/,
-      ];
-      return !dangerousPatterns.some(pattern => pattern.test(params.command.trim()));
-    },
-    execute: async (params) => {
-      try {
-        const timeout = params.timeout || 30000;
-        const options: any = { timeout };
-        
-        if (params.cwd) {
-          options.cwd = params.cwd;
-        }
-        
-        const { stdout, stderr } = await execAsync(params.command, options);
-        
-        return {
-          success: true,
-          command: params.command,
-          stdout,
-          stderr: stderr || null,
-          exitCode: 0,
-        };
-      } catch (error) {
-        return {
-          success: false,
-          command: params.command,
-          error: error.message,
-          exitCode: error.code || -1,
-          stderr: error.stderr || null,
-        };
-      }
-    },
-  },
-  {
-    id: 'system_info',
-    name: 'System Information',
-    description: 'Get system information',
-    category: 'system',
-    parameters: {
-      type: { type: 'string', description: 'Type of info (os, memory, cpu, disk, network, all)', optional: true },
+      type: { type: 'string', description: 'Type of info (browser, screen, network, all)', optional: true },
     },
     execute: async (params) => {
       try {
         const type = params.type || 'all';
         const info: any = {};
         
-        if (type === 'all' || type === 'os') {
-          info.os = {
-            platform: os.platform(),
-            type: os.type(),
-            release: os.release(),
-            hostname: os.hostname(),
-            arch: os.arch(),
-            uptime: os.uptime(),
+        if (type === 'all' || type === 'browser') {
+          info.browser = {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language,
+            languages: navigator.languages,
+            cookieEnabled: navigator.cookieEnabled,
+            onLine: navigator.onLine,
+            hardwareConcurrency: navigator.hardwareConcurrency,
+            maxTouchPoints: navigator.maxTouchPoints,
           };
         }
         
-        if (type === 'all' || type === 'memory') {
-          const totalMem = os.totalmem();
-          const freeMem = os.freemem();
-          info.memory = {
-            total: totalMem,
-            free: freeMem,
-            used: totalMem - freeMem,
-            usage: ((totalMem - freeMem) / totalMem * 100).toFixed(2) + '%',
+        if (type === 'all' || type === 'screen') {
+          info.screen = {
+            width: screen.width,
+            height: screen.height,
+            availWidth: screen.availWidth,
+            availHeight: screen.availHeight,
+            colorDepth: screen.colorDepth,
+            pixelDepth: screen.pixelDepth,
+            orientation: screen.orientation?.type || 'unknown',
           };
-        }
-        
-        if (type === 'all' || type === 'cpu') {
-          info.cpu = {
-            count: os.cpus().length,
-            model: os.cpus()[0].model,
-            speed: os.cpus()[0].speed,
-            loadAverage: os.loadavg(),
+          
+          info.window = {
+            innerWidth: window.innerWidth,
+            innerHeight: window.innerHeight,
+            outerWidth: window.outerWidth,
+            outerHeight: window.outerHeight,
+            devicePixelRatio: window.devicePixelRatio,
           };
-        }
-        
-        if (type === 'all' || type === 'disk') {
-          try {
-            const { stdout } = await execAsync('df -h');
-            info.disk = stdout;
-          } catch (error) {
-            info.disk = 'Disk information not available';
-          }
         }
         
         if (type === 'all' || type === 'network') {
-          const networkInterfaces = os.networkInterfaces();
-          info.network = {};
+          info.network = {
+            onLine: navigator.onLine,
+            connection: (navigator as any).connection ? {
+              effectiveType: (navigator as any).connection.effectiveType,
+              downlink: (navigator as any).connection.downlink,
+              rtt: (navigator as any).connection.rtt,
+              saveData: (navigator as any).connection.saveData,
+            } : 'Network Information API not available',
+          };
           
-          for (const [name, addresses] of Object.entries(networkInterfaces)) {
-            if (addresses) {
-              info.network[name] = addresses.map(addr => ({
-                address: addr.address,
-                netmask: addr.netmask,
-                family: addr.family,
-                mac: addr.mac,
-                internal: addr.internal,
-              }));
-            }
-          }
+          info.memory = (performance as any).memory ? {
+            jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit,
+            totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
+            usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
+          } : 'Memory API not available';
+        }
+        
+        if (type === 'all' || type === 'performance') {
+          const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+          info.performance = {
+            timing: {
+              domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+              loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
+              firstPaint: 'Requires Paint Timing API',
+            },
+            navigation: {
+              type: navigation.type,
+              redirectCount: performance.getEntriesByType('navigation').length,
+            },
+          };
         }
         
         return {
@@ -144,168 +85,28 @@ export const systemTools: AgentTool[] = [
           type,
           info,
           timestamp: new Date().toISOString(),
+          environment: 'client',
         };
-      } catch (error) {
+      } catch (error: any) {
         return { success: false, error: error.message };
       }
     },
   },
   {
-    id: 'system_process',
-    name: 'Process Management',
-    description: 'Manage system processes',
+    id: 'system_performance_client',
+    name: 'Client Performance Monitor',
+    description: 'Monitor client-side performance metrics',
     category: 'system',
     parameters: {
-      action: { type: 'string', description: 'Action (list, kill, info)' },
-      pid: { type: 'number', description: 'Process ID (for kill/info)', optional: true },
-      filter: { type: 'string', description: 'Filter processes by name', optional: true },
-    },
-    safetyCheck: (params) => {
-      if (!params.action || !['list', 'kill', 'info'].includes(params.action)) {
-        return false;
-      }
-      // Prevent killing critical system processes
-      if (params.action === 'kill' && params.pid) {
-        const criticalPids = [1, 2]; // init/systemd processes
-        return !criticalPids.includes(params.pid);
-      }
-      return true;
+      metric: { type: 'string', description: 'Metric to monitor (memory, timing, network)', optional: true },
+      duration: { type: 'number', description: 'Monitoring duration in seconds (default: 5)', optional: true },
     },
     execute: async (params) => {
       try {
-        switch (params.action) {
-          case 'list':
-            const { stdout } = await execAsync('ps aux');
-            const processes = stdout.split('\n').slice(1).filter(line => line.trim());
-            
-            let filteredProcesses = processes;
-            if (params.filter) {
-              filteredProcesses = processes.filter(line => 
-                line.toLowerCase().includes(params.filter.toLowerCase())
-              );
-            }
-            
-            return {
-              success: true,
-              action: 'list',
-              processes: filteredProcesses.slice(0, 50), // Limit to 50 processes
-              total: filteredProcesses.length,
-            };
-            
-          case 'kill':
-            if (!params.pid) {
-              return { success: false, error: 'PID is required for kill action' };
-            }
-            
-            try {
-              await execAsync(`kill ${params.pid}`);
-              return {
-                success: true,
-                action: 'kill',
-                pid: params.pid,
-                message: `Process ${params.pid} terminated`,
-              };
-            } catch (error) {
-              return {
-                success: false,
-                action: 'kill',
-                pid: params.pid,
-                error: `Failed to kill process ${params.pid}: ${error.message}`,
-              };
-            }
-            
-          case 'info':
-            if (!params.pid) {
-              return { success: false, error: 'PID is required for info action' };
-            }
-            
-            try {
-              const { stdout } = await execAsync(`ps -p ${params.pid} -o pid,ppid,cmd,%mem,%cpu,etime`);
-              return {
-                success: true,
-                action: 'info',
-                pid: params.pid,
-                info: stdout,
-              };
-            } catch (error) {
-              return {
-                success: false,
-                action: 'info',
-                pid: params.pid,
-                error: `Process ${params.pid} not found or access denied`,
-              };
-            }
-            
-          default:
-            return { success: false, error: 'Invalid action' };
-        }
-      } catch (error) {
-        return { success: false, error: error.message };
-      }
-    },
-  },
-  {
-    id: 'system_filesystem',
-    name: 'Filesystem Operations',
-    description: 'Perform filesystem operations',
-    category: 'system',
-    parameters: {
-      action: { type: 'string', description: 'Action (disk_usage, mount_points, file_types)' },
-      path: { type: 'string', description: 'Path for disk usage', optional: true },
-    },
-    execute: async (params) => {
-      try {
-        switch (params.action) {
-          case 'disk_usage':
-            const path = params.path || '.';
-            const { stdout: duOutput } = await execAsync(`du -sh "${path}"`);
-            return {
-              success: true,
-              action: 'disk_usage',
-              path,
-              usage: duOutput.trim(),
-            };
-            
-          case 'mount_points':
-            const { stdout: mountOutput } = await execAsync('mount -t proc,sysfs,tmpfs,devtmpfs');
-            return {
-              success: true,
-              action: 'mount_points',
-              mountPoints: mountOutput.split('\n').filter(line => line.trim()),
-            };
-            
-          case 'file_types':
-            const { stdout: typeOutput } = await execAsync('find / -type f -name "*.conf" -o -name "*.config" -o -name "*.ini" -o -name "*.yaml" -o -name "*.yml" -o -name "*.json" 2>/dev/null | head -20');
-            return {
-              success: true,
-              action: 'file_types',
-              configFiles: typeOutput.split('\n').filter(line => line.trim()),
-            };
-            
-          default:
-            return { success: false, error: 'Invalid action' };
-        }
-      } catch (error) {
-        return { success: false, error: error.message };
-      }
-    },
-  },
-  {
-    id: 'system_monitor',
-    name: 'System Monitor',
-    description: 'Monitor system resources',
-    category: 'system',
-    parameters: {
-      metric: { type: 'string', description: 'Metric to monitor (cpu, memory, disk, network)', optional: true },
-      interval: { type: 'number', description: 'Monitoring interval in seconds (default: 1)', optional: true },
-      duration: { type: 'number', description: 'Monitoring duration in seconds (default: 10)', optional: true },
-    },
-    execute: async (params) => {
-      try {
-        const metric = params.metric || 'cpu';
-        const interval = params.interval || 1;
-        const duration = params.duration || 10;
-        const samples = Math.floor(duration / interval);
+        const metric = params.metric || 'memory';
+        const duration = params.duration || 5;
+        const samples = 10;
+        const interval = duration * 1000 / samples;
         
         const results = [];
         
@@ -314,47 +115,205 @@ export const systemTools: AgentTool[] = [
           let value;
           
           switch (metric) {
-            case 'cpu':
-              const { stdout: cpuOutput } = await execAsync("top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d'%' -f1");
-              value = parseFloat(cpuOutput) || 0;
-              break;
-              
             case 'memory':
-              const { stdout: memOutput } = await execAsync("free | grep Mem | awk '{printf \"%.2f\", $3/$2 * 100.0}'");
-              value = parseFloat(memOutput) || 0;
+              value = (performance as any).memory ? {
+                usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
+                totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
+                jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit,
+              } : { error: 'Memory API not available' };
               break;
               
-            case 'disk':
-              const { stdout: diskOutput } = await execAsync("df -h / | tail -1 | awk '{print $5}' | cut -d'%' -f1");
-              value = parseFloat(diskOutput) || 0;
+            case 'timing':
+              const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+              value = {
+                domInteractive: navigation.domInteractive,
+                domComplete: navigation.domComplete,
+                loadEventEnd: navigation.loadEventEnd,
+              };
               break;
               
             case 'network':
-              const { stdout: netOutput } = await execAsync("cat /proc/net/dev | grep eth0 | awk '{print $2,$10}'");
-              const [rx, tx] = netOutput.trim().split(' ');
-              value = { rx: parseInt(rx) || 0, tx: parseInt(tx) || 0 };
+              value = (navigator as any).connection ? {
+                effectiveType: (navigator as any).connection.effectiveType,
+                downlink: (navigator as any).connection.downlink,
+                rtt: (navigator as any).connection.rtt,
+              } : { error: 'Network Information API not available' };
               break;
               
             default:
-              value = 0;
+              value = { error: 'Unknown metric' };
           }
           
           results.push({ timestamp, value });
           
           if (i < samples - 1) {
-            await new Promise(resolve => setTimeout(resolve, interval * 1000));
+            await new Promise(resolve => setTimeout(resolve, interval));
           }
         }
         
         return {
           success: true,
           metric,
-          interval,
           duration,
           samples: results.length,
           results,
+          environment: 'client',
         };
-      } catch (error) {
+      } catch (error: any) {
+        return { success: false, error: error.message };
+      }
+    },
+  },
+  {
+    id: 'system_storage_client',
+    name: 'Client Storage Info',
+    description: 'Get client-side storage information',
+    category: 'system',
+    parameters: {
+      type: { type: 'string', description: 'Type of storage (local, session, cookie, indexeddb, all)', optional: true },
+    },
+    execute: async (params) => {
+      try {
+        const type = params.type || 'all';
+        const info: any = {};
+        
+        if (type === 'all' || type === 'local') {
+          try {
+            info.localStorage = {
+              length: localStorage.length,
+              estimatedSize: new Blob(Object.values(localStorage)).size,
+              keys: Object.keys(localStorage),
+            };
+          } catch (error) {
+            info.localStorage = { error: 'LocalStorage not available' };
+          }
+        }
+        
+        if (type === 'all' || type === 'session') {
+          try {
+            info.sessionStorage = {
+              length: sessionStorage.length,
+              estimatedSize: new Blob(Object.values(sessionStorage)).size,
+              keys: Object.keys(sessionStorage),
+            };
+          } catch (error) {
+            info.sessionStorage = { error: 'SessionStorage not available' };
+          }
+        }
+        
+        if (type === 'all' || type === 'cookie') {
+          try {
+            const cookies = document.cookie.split(';').map(cookie => cookie.trim());
+            info.cookies = {
+              count: cookies.length,
+              size: new Blob(document.cookie).size,
+              domains: [...new Set(cookies.map(cookie => cookie.split('=')[0]))],
+            };
+          } catch (error) {
+            info.cookies = { error: 'Cookies not available' };
+          }
+        }
+        
+        if (type === 'all' || type === 'indexeddb') {
+          try {
+            const databases = await (window.indexedDB as any).databases();
+            info.indexedDB = {
+              count: databases.length,
+              databases: databases.map((db: any) => ({ name: db.name, version: db.version })),
+            };
+          } catch (error) {
+            info.indexedDB = { error: 'IndexedDB not available' };
+          }
+        }
+        
+        return {
+          success: true,
+          type,
+          info,
+          timestamp: new Date().toISOString(),
+          environment: 'client',
+        };
+      } catch (error: any) {
+        return { success: false, error: error.message };
+      }
+    },
+  },
+  {
+    id: 'system_geolocation_client',
+    name: 'Client Geolocation',
+    description: 'Get client location information (requires permission)',
+    category: 'system',
+    parameters: {
+      highAccuracy: { type: 'boolean', description: 'Use high accuracy mode', optional: true },
+      timeout: { type: 'number', description: 'Timeout in milliseconds', optional: true },
+    },
+    execute: async (params) => {
+      try {
+        if (!navigator.geolocation) {
+          return { success: false, error: 'Geolocation not available' };
+        }
+        
+        const options: PositionOptions = {
+          enableHighAccuracy: params.highAccuracy || false,
+          timeout: params.timeout || 10000,
+          maximumAge: 0,
+        };
+        
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, options);
+        });
+        
+        return {
+          success: true,
+          location: {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            altitude: position.coords.altitude,
+            altitudeAccuracy: position.coords.altitudeAccuracy,
+            heading: position.coords.heading,
+            speed: position.coords.speed,
+            timestamp: position.timestamp,
+          },
+          timestamp: new Date().toISOString(),
+          environment: 'client',
+        };
+      } catch (error: any) {
+        return { 
+          success: false, 
+          error: error.message,
+          code: error.code,
+          permissionDenied: error.code === error.PERMISSION_DENIED,
+        };
+      }
+    },
+  },
+  {
+    id: 'system_battery_client',
+    name: 'Client Battery Info',
+    description: 'Get client battery information (if available)',
+    category: 'system',
+    parameters: {},
+    execute: async (params) => {
+      try {
+        if (!(navigator as any).getBattery) {
+          return { success: false, error: 'Battery API not available' };
+        }
+        
+        const battery = await (navigator as any).getBattery();
+        
+        return {
+          success: true,
+          battery: {
+            level: battery.level,
+            charging: battery.charging,
+            chargingTime: battery.chargingTime,
+            dischargingTime: battery.dischargingTime,
+          },
+          timestamp: new Date().toISOString(),
+          environment: 'client',
+        };
+      } catch (error: any) {
         return { success: false, error: error.message };
       }
     },
