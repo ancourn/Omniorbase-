@@ -1,141 +1,291 @@
-# 🚀 Welcome to Z.ai Code Scaffold
+# Unlimited Agentic AI System
 
-A modern, production-ready web application scaffold powered by cutting-edge technologies, designed to accelerate your development with [Z.ai](https://chat.z.ai)'s AI-powered coding assistance.
+A comprehensive, extensible AI agent system with advanced decision-making capabilities, learning mechanisms, and a wide range of tools for various domains including software development, system administration, web operations, and more.
 
-## ✨ Technology Stack
+## 🌟 Features
 
-This scaffold provides a robust foundation built with:
+### Core Capabilities
+- **Advanced Decision-Making Engine**: Multi-strategy AI-powered decision making with adaptive learning
+- **Comprehensive Tool System**: 50+ specialized tools across 6 categories
+- **Learning & Adaptation**: Continuous improvement from interactions
+- **Performance Monitoring**: Real-time metrics and health monitoring
+- **Extensible Architecture**: Easy to add new tools and capabilities
 
-### 🎯 Core Framework
-- **⚡ Next.js 15** - The React framework for production with App Router
-- **📘 TypeScript 5** - Type-safe JavaScript for better developer experience
-- **🎨 Tailwind CSS 4** - Utility-first CSS framework for rapid UI development
-
-### 🧩 UI Components & Styling
-- **🧩 shadcn/ui** - High-quality, accessible components built on Radix UI
-- **🎯 Lucide React** - Beautiful & consistent icon library
-- **🌈 Framer Motion** - Production-ready motion library for React
-- **🎨 Next Themes** - Perfect dark mode in 2 lines of code
-
-### 📋 Forms & Validation
-- **🎣 React Hook Form** - Performant forms with easy validation
-- **✅ Zod** - TypeScript-first schema validation
-
-### 🔄 State Management & Data Fetching
-- **🐻 Zustand** - Simple, scalable state management
-- **🔄 TanStack Query** - Powerful data synchronization for React
-- **🌐 Axios** - Promise-based HTTP client
-
-### 🗄️ Database & Backend
-- **🗄️ Prisma** - Next-generation Node.js and TypeScript ORM
-- **🔐 NextAuth.js** - Complete open-source authentication solution
-
-### 🎨 Advanced UI Features
-- **📊 TanStack Table** - Headless UI for building tables and datagrids
-- **🖱️ DND Kit** - Modern drag and drop toolkit for React
-- **📊 Recharts** - Redefined chart library built with React and D3
-- **🖼️ Sharp** - High performance image processing
-
-### 🌍 Internationalization & Utilities
-- **🌍 Next Intl** - Internationalization library for Next.js
-- **📅 Date-fns** - Modern JavaScript date utility library
-- **🪝 ReactUse** - Collection of essential React hooks for modern development
-
-## 🎯 Why This Scaffold?
-
-- **🏎️ Fast Development** - Pre-configured tooling and best practices
-- **🎨 Beautiful UI** - Complete shadcn/ui component library with advanced interactions
-- **🔒 Type Safety** - Full TypeScript configuration with Zod validation
-- **📱 Responsive** - Mobile-first design principles with smooth animations
-- **🗄️ Database Ready** - Prisma ORM configured for rapid backend development
-- **🔐 Auth Included** - NextAuth.js for secure authentication flows
-- **📊 Data Visualization** - Charts, tables, and drag-and-drop functionality
-- **🌍 i18n Ready** - Multi-language support with Next Intl
-- **🚀 Production Ready** - Optimized build and deployment settings
-- **🤖 AI-Friendly** - Structured codebase perfect for AI assistance
+### Tool Categories
+1. **File Operations**: Read, write, search, analyze, and organize files
+2. **Web Tools**: Search, fetch, validate, and extract web content
+3. **Code Generation**: Multi-language support with analysis, debugging, and optimization
+4. **System Operations**: Command execution, process management, and monitoring
+5. **Deployment**: Multi-environment deployment with monitoring
+6. **Communication**: Email, messaging, API, and webhook management
 
 ## 🚀 Quick Start
 
-```bash
-# Install dependencies
-npm install
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Git
 
-# Start development server
-npm run dev
+### Installation
 
-# Build for production
-npm run build
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/ancourn/Omniorbase-.git
+   cd Omniorbase-
+   ```
 
-# Start production server
-npm start
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) to see your application running.
+3. **Set up the database**
+   ```bash
+   npm run db:push
+   ```
 
-## 🤖 Powered by Z.ai
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-This scaffold is optimized for use with [Z.ai](https://chat.z.ai) - your AI assistant for:
-
-- **💻 Code Generation** - Generate components, pages, and features instantly
-- **🎨 UI Development** - Create beautiful interfaces with AI assistance  
-- **🔧 Bug Fixing** - Identify and resolve issues with intelligent suggestions
-- **📝 Documentation** - Auto-generate comprehensive documentation
-- **🚀 Optimization** - Performance improvements and best practices
-
-Ready to build something amazing? Start chatting with Z.ai at [chat.z.ai](https://chat.z.ai) and experience the future of AI-powered development!
+5. **Open your browser**
+   Navigate to `http://localhost:3000` to access the AI agent interface.
 
 ## 📁 Project Structure
 
 ```
 src/
-├── app/                 # Next.js App Router pages
-├── components/          # Reusable React components
-│   └── ui/             # shadcn/ui components
-├── hooks/              # Custom React hooks
-└── lib/                # Utility functions and configurations
+├── app/                    # Next.js App Router
+│   ├── page.tsx           # Main application interface
+│   ├── layout.tsx         # Root layout
+│   └── globals.css        # Global styles
+├── lib/
+│   ├── agent/             # Core agent system
+│   │   ├── types.ts       # Type definitions
+│   │   ├── agent-engine.ts # Main agent engine
+│   │   ├── learning.ts    # Learning mechanisms
+│   │   ├── monitoring.ts  # Performance monitoring
+│   │   └── tools/         # Tool implementations
+│   │       ├── file-tools.ts
+│   │       ├── web-tools.ts
+│   │       ├── code-tools.ts
+│   │       ├── system-tools.ts
+│   │       ├── deployment-tools.ts
+│   │       ├── communication-tools.ts
+│   │       └── index.ts
+│   ├── db.ts              # Database client
+│   ├── socket.ts          # Socket.io configuration
+│   └── utils.ts           # Utility functions
+├── components/
+│   └── ui/                # shadcn/ui components
+├── hooks/                 # Custom React hooks
+└── prisma/
+    └── schema.prisma      # Database schema
 ```
 
-## 🎨 Available Features & Components
+## 🔧 Configuration
 
-This scaffold includes a comprehensive set of modern web development tools:
+### Environment Variables
+Create a `.env.local` file in the root directory:
 
-### 🧩 UI Components (shadcn/ui)
-- **Layout**: Card, Separator, Aspect Ratio, Resizable Panels
-- **Forms**: Input, Textarea, Select, Checkbox, Radio Group, Switch
-- **Feedback**: Alert, Toast (Sonner), Progress, Skeleton
-- **Navigation**: Breadcrumb, Menubar, Navigation Menu, Pagination
-- **Overlay**: Dialog, Sheet, Popover, Tooltip, Hover Card
-- **Data Display**: Badge, Avatar, Calendar
+```env
+# Database
+DATABASE_URL="file:./dev.db"
 
-### 📊 Advanced Data Features
-- **Tables**: Powerful data tables with sorting, filtering, pagination (TanStack Table)
-- **Charts**: Beautiful visualizations with Recharts
-- **Forms**: Type-safe forms with React Hook Form + Zod validation
+# NextAuth
+NEXTAUTH_SECRET="your-secret-here"
+NEXTAUTH_URL="http://localhost:3000"
 
-### 🎨 Interactive Features
-- **Animations**: Smooth micro-interactions with Framer Motion
-- **Drag & Drop**: Modern drag-and-drop functionality with DND Kit
-- **Theme Switching**: Built-in dark/light mode support
+# AI SDK (if needed)
+ZAI_API_KEY="your-zai-api-key"
+```
 
-### 🔐 Backend Integration
-- **Authentication**: Ready-to-use auth flows with NextAuth.js
-- **Database**: Type-safe database operations with Prisma
-- **API Client**: HTTP requests with Axios + TanStack Query
-- **State Management**: Simple and scalable with Zustand
+### Available Scripts
 
-### 🌍 Production Features
-- **Internationalization**: Multi-language support with Next Intl
-- **Image Optimization**: Automatic image processing with Sharp
-- **Type Safety**: End-to-end TypeScript with Zod validation
-- **Essential Hooks**: 100+ useful React hooks with ReactUse for common patterns
+```bash
+# Development
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
 
-## 🤝 Get Started with Z.ai
+# Database
+npm run db:push      # Push schema to database
+npm run db:generate  # Generate Prisma client
+npm run db:migrate   # Run migrations
+npm run db:reset     # Reset database
+```
 
-1. **Clone this scaffold** to jumpstart your project
-2. **Visit [chat.z.ai](https://chat.z.ai)** to access your AI coding assistant
-3. **Start building** with intelligent code generation and assistance
-4. **Deploy with confidence** using the production-ready setup
+## 🎯 Usage Guide
+
+### Interacting with the AI Agent
+
+1. **Chat Interface**: Use the main chat interface to communicate with the AI agent
+2. **Tool Execution**: The agent can automatically execute tools based on your requests
+3. **Monitoring**: View real-time performance metrics and system status
+4. **Learning**: The agent learns from interactions to improve over time
+
+### Example Interactions
+
+```bash
+# File operations
+"Read the contents of src/app/page.tsx"
+"Create a new file called test.js with console.log('Hello')"
+
+# Web operations
+"Search for information about Next.js 15"
+"Fetch content from https://api.github.com"
+
+# Code generation
+"Generate a Python function to calculate fibonacci"
+"Analyze this JavaScript code for performance issues"
+
+# System operations
+"Show system information"
+"List running processes"
+
+# Deployment
+"Build a Docker image for this project"
+"Deploy to Kubernetes"
+```
+
+## 🛠️ Development
+
+### Adding New Tools
+
+1. **Create a new tool file** in `src/lib/agent/tools/`
+2. **Implement the tool interface**:
+   ```typescript
+   export const newTool: AgentTool = {
+     id: 'tool_id',
+     name: 'Tool Name',
+     description: 'Tool description',
+     category: 'category',
+     parameters: { /* parameter definitions */ },
+     safetyCheck: (params) => { /* safety validation */ },
+     execute: async (params) => { /* tool logic */ },
+   };
+   ```
+3. **Add the tool** to the export in `src/lib/agent/tools/index.ts`
+
+### Extending the Agent
+
+The agent architecture is designed to be extensible:
+
+- **Decision Making**: Modify `src/lib/agent/agent-engine.ts` to add new decision strategies
+- **Learning**: Enhance `src/lib/agent/learning.ts` to add new learning mechanisms
+- **Monitoring**: Extend `src/lib/agent/monitoring.ts` for additional metrics
+
+## 📊 Performance Monitoring
+
+The system includes comprehensive performance monitoring:
+
+- **Response Time**: Track agent response times
+- **Success Rate**: Monitor tool execution success rates
+- **Memory Usage**: Track memory consumption
+- **CPU Usage**: Monitor CPU utilization
+- **Error Rates**: Track error frequencies
+
+Access monitoring data through the UI or programmatically via the `MonitoringService` class.
+
+## 🔒 Security Features
+
+### Safety Checks
+- **Tool Validation**: All tools include safety checks before execution
+- **Parameter Validation**: Input validation for all tool parameters
+- **Path Security**: Protection against directory traversal and sensitive file access
+- **Command Safety**: Prevention of dangerous system commands
+
+### Configuration
+- **Safety Levels**: Configurable safety levels (low, medium, high)
+- **Permission-based Operations**: Tools require appropriate permissions
+- **Audit Logging**: All operations are logged for accountability
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Development Guidelines
+
+- Follow TypeScript best practices
+- Include type definitions for all new code
+- Add comprehensive JSDoc comments
+- Implement proper error handling
+- Include safety checks for new tools
+- Write tests for new functionality
+
+## 📈 Roadmap
+
+### Phase 1: Core System ✅
+- [x] Agent engine with decision-making capabilities
+- [x] Comprehensive tool system
+- [x] Learning and adaptation mechanisms
+- [x] Interactive user interface
+- [x] Performance monitoring
+
+### Phase 2: Enhanced Features
+- [ ] Advanced AI integration with multiple models
+- [ ] Real-time collaboration features
+- [ ] Advanced analytics dashboard
+- [ ] Plugin system for third-party tools
+- [ ] Multi-agent coordination
+
+### Phase 3: Enterprise Features
+- [ ] Advanced security and authentication
+- [ ] Scalability improvements
+- [ ] Enterprise deployment options
+- [ ] Advanced monitoring and alerting
+- [ ] API for external integrations
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Port Already in Use**
+```bash
+# Kill process on port 3000
+lsof -ti:3000 | xargs kill -9
+```
+
+**Database Issues**
+```bash
+# Reset database
+npm run db:reset
+
+# Regenerate Prisma client
+npm run db:generate
+```
+
+**Build Errors**
+```bash
+# Clear Next.js cache
+rm -rf .next
+npm run build
+```
+
+### Getting Help
+
+- Check the [PROJECT_MANIFEST.md](./PROJECT_MANIFEST.md) for current implementation status
+- Review the issues section for known problems
+- Create a new issue for bugs or feature requests
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js 15](https://nextjs.org/)
+- UI components from [shadcn/ui](https://ui.shadcn.com/)
+- AI capabilities powered by [ZAI SDK](https://z-ai.com/)
+- Database management with [Prisma](https://prisma.io/)
+- Styling with [Tailwind CSS](https://tailwindcss.com/)
 
 ---
 
-Built with ❤️ for the developer community. Supercharged by [Z.ai](https://chat.z.ai) 🚀
+**Note**: A backup snapshot was created before pushing to GitHub: `unlimited-agentic-ai-backup-20250903-005348.tar.gz`
